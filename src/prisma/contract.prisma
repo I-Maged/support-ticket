@@ -1,0 +1,10 @@
+// use prisma-8
+model Ticket {
+  id          Int                  @id @default(autoincrement())
+  subject     String
+  description String
+  priority    String
+  status      String               @default("Open")
+  createdAt   DateTime             @default(now())
+  updatedAt   temporal.updatedAt()
+}

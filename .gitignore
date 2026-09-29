@@ -17,6 +17,12 @@
 /.next/
 /out/
 
+# prisma
+/.agents/
+/.claude/
+/.cursor/
+/.devin/
+
 # production
 /build
 
@@ -39,3 +45,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Sentry Config File
+.env.sentry-build-plugin
+node_modules/
+dist/
+.env
