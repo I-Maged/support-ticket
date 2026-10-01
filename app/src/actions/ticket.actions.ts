@@ -84,3 +84,27 @@ export async function getTickets() {
     return [];
   }
 }
+
+export async function getTicketById(id: string) {
+  try {
+    const ticket = await db.orm.public.Ticket.where((u) =>
+      u.id.eq(Number(id)),
+    ).first();
+
+    if (!ticket) {
+      logEvent("Ticket not found", "ticket", { ticketId: id }, "warning");
+    }
+
+    return ticket;
+  } catch (error) {
+    logEvent(
+      "Error fetching ticket details",
+      "ticket",
+      { ticketId: id },
+      "error",
+      error,
+    );
+
+    return null;
+  }
+}
