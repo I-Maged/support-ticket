@@ -3,6 +3,8 @@
 import { db } from "@/src/prisma/db";
 import { revalidatePath } from "next/cache";
 import { logEvent } from "../utils/sentry";
+import { OrderByItem } from "@prisma/orm-postgres/relational-core";
+import { count } from "console";
 
 export async function createTicket(
   prevState: { success: boolean; message: string },
@@ -59,5 +61,26 @@ export async function createTicket(
       success: false,
       message: "An error occured while creating the ticket",
     };
+  }
+}
+
+export async function getTickets() {
+  try {
+    const tickets = await db.orm.public.Ticket.orderBy((t) =>
+      t.createdAt.desc(),
+    ).all();
+
+    logEvent(
+      "Fetched tickets list",
+      "tickets",
+      { count: tickets.length },
+      "info",
+    );
+
+    return tickets;
+  } catch (error) {
+    logEvent("Error fetching tickets", "tickets", {}, "error", error);
+
+    return [];
   }
 }
