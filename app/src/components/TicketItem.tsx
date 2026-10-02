@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { getPriorityClass } from "../utils/ui";
 
-import { Models } from "@/src/prisma/contract";
+import type { getTickets } from "../actions/ticket.actions";
 
-type Ticket = Models.public_Ticket;
+type Ticket = Awaited<ReturnType<typeof getTickets>>[number];
 
 type TicketItemProps = {
   ticket: Ticket;

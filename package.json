@@ -5,16 +5,15 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "prebuild": "prisma contract emit",
+    "prebuild": "node node_modules/prisma/dist/prisma.js contract emit",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "postinstall": "prisma skills sync || exit 0",
-    "contract:emit": "prisma contract emit",
+    "postinstall": "node node_modules/prisma/dist/prisma.js skills sync || exit 0",
+    "contract:emit": "node node_modules/prisma/dist/prisma.js contract emit",
     "studio": "node scripts/studio.mjs"
   },
   "dependencies": {
-    "@prisma/client": "^7.10.0",
     "@prisma/orm-postgres": "^8.0.0-rc.13",
     "@sentry/nextjs": "^11.1.0",
     "dotenv": "^18.0.4",

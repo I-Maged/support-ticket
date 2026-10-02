@@ -68,7 +68,9 @@ export async function getTickets() {
   try {
     const tickets = await db.orm.public.Ticket.orderBy((t) =>
       t.createdAt.desc(),
-    ).all();
+    )
+      .include("user")
+      .all();
 
     logEvent(
       "Fetched tickets list",
