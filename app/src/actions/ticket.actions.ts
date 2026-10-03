@@ -3,8 +3,6 @@
 import { db } from "@/src/prisma/db";
 import { revalidatePath } from "next/cache";
 import { logEvent } from "../utils/sentry";
-import { OrderByItem } from "@prisma/orm-postgres/relational-core";
-import { count } from "console";
 
 export async function createTicket(
   prevState: { success: boolean; message: string },
