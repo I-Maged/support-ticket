@@ -1,12 +1,19 @@
 import { getTicketById } from "@/app/src/actions/ticket.actions";
+import { getCurrentUser } from "@/app/src/lib/current-user";
 import { logEvent } from "@/app/src/utils/sentry";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { getPriorityClass } from "@/app/src/utils/ui";
 
 const TicketDetailsPage = async (props: {
   params: Promise<{ id: string }>;
 }) => {
+  const user = await getCurrentUser();
+
+  if (!user) {
+    redirect("/login");
+  }
+
   const { id } = await props.params;
   const ticket = await getTicketById(id);
 
