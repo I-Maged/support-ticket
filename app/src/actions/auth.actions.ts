@@ -88,3 +88,46 @@ export async function logoutUser(): Promise<{
     return { success: false, message: "Logout failed. Please try again" };
   }
 }
+
+export async function loginUser(
+  prevState: ResponseResult,
+  formData: FormData,
+): Promise<ResponseResult> {
+  try {
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+
+    if (!email || !password) {
+      logEvent("Failed login attempt", "auth", { email }, "warning");
+
+      return { success: false, message: "All fields are required" };
+    }
+
+    const user = await db.orm.public.User.where((u) =>
+      u.email.eq(email),
+    ).first();
+
+    if (!user || !user.password) {
+      logEvent("Could not find user email", "auth", { email }, "warning");
+
+      return { success: false, message: "Invalid credentials" };
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      logEvent("Wrong password", "auth", { email }, "warning");
+
+      return { success: false, message: "Invalid credentials" };
+    }
+
+    const token = await signAuthToken({ userId: user.id });
+    await setAuthCookie(token);
+
+    return { success: true, message: "Logged in successfully" };
+  } catch (error) {
+    logEvent("Unexpected error during login", "auth", {}, "error", error);
+
+    return { success: false, message: "Error during log in" };
+  }
+}
