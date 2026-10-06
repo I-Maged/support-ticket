@@ -122,9 +122,7 @@ export async function getTicketById(id: string) {
       return null;
     }
 
-    const ticket = await db.orm.public.Ticket.where((t) =>
-      t.id.eq(Number(id)),
-    )
+    const ticket = await db.orm.public.Ticket.where((t) => t.id.eq(Number(id)))
       .where((t) => t.userId.eq(user.id))
       .first();
 
@@ -143,5 +141,65 @@ export async function getTicketById(id: string) {
     );
 
     return null;
+  }
+}
+
+export async function closeTicket(
+  prevState: { success: boolean; message: string },
+  formData: FormData,
+): Promise<{ success: boolean; message: string }> {
+  try {
+    const user = await getCurrentUser();
+
+    if (!user) {
+      logEvent("Could not retrieve User ID", "ticket", {}, "warning");
+
+      return { success: false, message: "User must be logged in" };
+    }
+
+    const ticketId = Number(formData.get("ticketId"));
+
+    if (!ticketId) {
+      logEvent("Could not retrieve Ticket ID", "ticket", {}, "warning");
+
+      return { success: false, message: "Ticket ID is required" };
+    }
+
+    const ticket = await db.orm.public.Ticket.where((t) =>
+      t.id.eq(ticketId),
+    ).first();
+
+    if (!ticket || ticket.userId !== user.id) {
+      logEvent(
+        "Unauthorized ticket close attempt",
+        "ticket",
+        { ticketId, userId: user.id },
+        "warning",
+      );
+
+      return {
+        success: false,
+        message: "You are not authorized to close this ticket",
+      };
+    }
+
+    await db.orm.public.Ticket.where({ id: ticketId }).update({
+      status: "Closed",
+    });
+
+    revalidatePath("/tickets");
+    revalidatePath(`/tickets/${ticketId}`);
+
+    return { success: true, message: "Ticket closed successfully" };
+  } catch (error) {
+    logEvent(
+      "Error fetching ticket details",
+      "ticket",
+      { formData: Object.fromEntries(formData.entries()) },
+      "error",
+      error,
+    );
+
+    return { success: false, message: "Error closing the ticket" };
   }
 }

@@ -4,6 +4,7 @@ import { logEvent } from "@/app/src/utils/sentry";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getPriorityClass } from "@/app/src/utils/ui";
+import CloseTicketButton from "@/app/src/components/CloseTicketButton";
 
 const TicketDetailsPage = async (props: {
   params: Promise<{ id: string }>;
@@ -50,12 +51,12 @@ const TicketDetailsPage = async (props: {
           ← Back to Tickets
         </Link>
 
-        {/* {ticket.status !== 'Closed' && (
+        {ticket.status !== "Closed" && (
           <CloseTicketButton
             ticketId={ticket.id}
-            isClosed={ticket.status === 'Closed'}
+            isClosed={ticket.status === "Closed"}
           />
-        )} */}
+        )}
       </div>
     </div>
   );
