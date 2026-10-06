@@ -4,6 +4,7 @@ import { db } from "@/src/prisma/db";
 import bcrypt from "bcryptjs";
 import { logEvent } from "../utils/sentry";
 import { signAuthToken, setAuthCookie, removeAuthCookie } from "../lib/auth";
+import { redirect } from "next/navigation";
 
 type ResponseResult = {
   success: boolean;
@@ -78,15 +79,16 @@ export async function registerUser(
 export async function logoutUser(): Promise<{
   success: boolean;
   message: string;
-}> {
+} | void> {
   try {
     await removeAuthCookie();
     logEvent("User logged out successfully", "auth", {}, "info");
-    return { success: true, message: "Logout successful" };
   } catch (error) {
     logEvent("Unexpected error logging out", "auth", {}, "error", error);
     return { success: false, message: "Logout failed. Please try again" };
   }
+
+  redirect("/login");
 }
 
 export async function loginUser(
